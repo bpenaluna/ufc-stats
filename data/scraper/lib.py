@@ -42,7 +42,7 @@ class Scraper:
     def parse_fighter_details(self, soup: BeautifulSoup) -> List[str]:
         '''
         Parses the fighter details returning a list with the details:
-        first name, last name, nickname, height, weight, reach, stance, wins, losses, draws, url
+        name, height, weight, reach, stance, wins, losses, draws
         
         :param soup: Soup object of the fighter
         :type soup: BeautifulSoup
@@ -112,6 +112,10 @@ class Scraper:
 
         row += map(lambda x: x.get_text(strip=True).split(':')[1], fight_details_text[:4]) # round, time, time_format, ref
         row.append(soup.find_all('p', class_='b-fight-details__text')[1].get_text(strip=True).replace('Details:', '')) # details
+        
+        fight_details = soup.find_all('div', class_='b-fight-details__person')
+        row += map(lambda x: x.find('i').get_text(strip=True), fight_details) # red_outcome, blue_outcome
+        row += map(lambda x: x.find('p', class_='b-fight-details__person-title').get_text(strip=True), fight_details) # red_nickname, blue_nickname
 
         # Totals table
         if len(tables) > 1:
@@ -133,23 +137,25 @@ class Scraper:
         rows = []
         row = []
 
-        col_labels = ['title', 'method', 'round', 'time', 'time_format', 'ref', 'details',
-                      'blue_fighter', 'red_fighter', 'blue_fighter_kd', 'red_fighter_kd', 'blue_fighter_sig_str', 'red_fighter_sig_str',
-                      'blue_fighter_sig_str_perc', 'red_fighter_sig_str_perc', 'blue_fighter_total_str', 'red_fighter_total_str',
-                      'blue_fighter_td', 'red_fighter_td', 'blue_fighter_td_perc', 'red_fighter_td_perc', 'blue_fighter_sub_att', 'red_fighter_sub_att',
-                      'blue_fighter_rev', 'red_fighter_rev', 'blue_fighter_ctrl', 'red_fighter_ctrl', 'blue_fighter_sig_str_head', 
-                      'red_fighter_sig_str_head', 'blue_fighter_sig_str_body', 'red_fighter_sig_str_body', 'blue_fighter_sig_str_leg',
-                      'red_fighter_sig_str_leg', 'blue_fighter_sig_str_distance', 'red_fighter_sig_str_distance', 'blue_fighter_sig_str_clinch',
-                      'red_fighter_sig_str_clinch', 'blue_fighter_sig_str_ground', 'red_fighter_sig_str_ground']
+        col_labels = ['date', 'location', 'title', 'method', 'round', 'time', 'time_format', 'ref', 'details', 'red_outcome', 'blue_outcome', 'red_nickname', 'blue_nickname', 
+                      'red_fighter', 'blue_fighter', 'red_fighter_kd', 'blue_fighter_kd', 'red_fighter_sig_str', 'blue_fighter_sig_str',
+                      'red_fighter_sig_str_perc', 'blue_fighter_sig_str_perc', 'red_fighter_total_str', 'blue_fighter_total_str',
+                      'red_fighter_td', 'blue_fighter_td', 'red_fighter_td_perc', 'blue_fighter_td_perc', 'red_fighter_sub_att', 'blue_fighter_sub_att',
+                      'red_fighter_rev', 'blue_fighter_rev', 'red_fighter_ctrl', 'blue_fighter_ctrl', 'red_fighter_sig_str_head', 
+                      'blue_fighter_sig_str_head', 'red_fighter_sig_str_body', 'blue_fighter_sig_str_body', 'red_fighter_sig_str_leg',
+                      'blue_fighter_sig_str_leg', 'red_fighter_sig_str_distance', 'blue_fighter_sig_str_distance', 'red_fighter_sig_str_clinch',
+                      'blue_fighter_sig_str_clinch', 'red_fighter_sig_str_ground', 'blue_fighter_sig_str_ground']
 
-        events = soup.find_all('tr', class_='b-statistics__table-row')[3:3 + lim] if lim else soup.find_all('tr', class_='b-statistics__table-row')[3:]
+        events = soup.find_all('tr', class_='b-statistics__table-row')[2:2 + lim] if lim else soup.find_all('tr', class_='b-statistics__table-row')[2:]
 
         for event in tqdm(events, desc='Event'):
+            date = event.find('span', class_='b-statistics__date').get_text(strip=True)
+            location = event.find('td', class_='b-statistics__table-col b-statistics__table-col_style_big-top-padding').get_text(strip=True)
             url = event.find('a', class_='b-link b-link_style_black')['href']
             event_soup = self.get_soup(url)
             for fight in event_soup.find_all('tr', class_='b-fight-details__table-row b-fight-details__table-row__hover js-fight-details-click'):
                 fight_soup = self.get_soup(fight['data-link'])
-                row = self.parse_fight_details(fight_soup)
+                row = [date, location] + self.parse_fight_details(fight_soup)
                 if row:
                     rows.append(row)
 
@@ -164,7 +170,7 @@ if __name__ == '__main__':
     scraper = Scraper()
     # soup = scraper.get_soup('http://ufcstats.com/fighter-details/ce783bf73b5131f9')
     # data = scraper.parse_fighter_details(soup)
-    data = scraper.scrape_fighter_details()
+    data = scraper.scrape_fight_details(lim=1)
     scraper.close()
 
     print(data.head())

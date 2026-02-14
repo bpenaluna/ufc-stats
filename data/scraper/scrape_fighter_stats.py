@@ -3,7 +3,7 @@ from sqlalchemy import create_engine
 from lib import Scraper
 import config
 
-conn_str = f"mssql+pyodbc://{config.DB_SERVER}/{config.DB_NAME}?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes"
+conn_str = f"mssql+pyodbc://localhost/ufc?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes"
 engine = create_engine(conn_str)
 
 scraper = Scraper()
