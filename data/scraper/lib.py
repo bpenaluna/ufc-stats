@@ -23,20 +23,20 @@ class Scraper:
         # return
         return soup
 
-    # def get_urls(self, soup: BeautifulSoup) -> List[str]:
-    #     '''
-    #     Docstring for get_urls
+    def get_urls(self, soup: BeautifulSoup) -> List[str]:
+        '''
+        Docstring for get_urls
         
-    #     :param soup: BeautifulSoup object
-    #     :type soup: BeautifulSoup
-    #     :return: List of urls
-    #     :rtype: List[str]
-    #     '''
-    #     rows = soup.find_all('tr', class_='b-statistics__table-row')[2:]
-    #     urls = []
-    #     for row in rows:
-    #         urls.append(row.find('a', class_='b-link b-link_style_black')['href'])
-    #     return urls
+        :param soup: BeautifulSoup object
+        :type soup: BeautifulSoup
+        :return: List of urls
+        :rtype: List[str]
+        '''
+        rows = soup.find_all('tr', class_='b-statistics__table-row')[2:]
+        urls = []
+        for row in rows:
+            urls.append(row.find('a', class_='b-link b-link_style_black')['href'])
+        return urls
 
 
     def parse_fighter_details(self, soup: BeautifulSoup) -> List[str]:
@@ -81,7 +81,7 @@ class Scraper:
         '''
         chars = ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o',
                 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z']
-        col_labels = ['fighter_id', 'name', 'nickname', 'wins', 'losses', 'draws', 'height', 'weight', 'reach', 'stance', 'dob', 'sig_str_pm', 'str_acc', 'strikes_abs_pm', 'sig_str_def', 'td_avg', 'td_acc', 'td_def', 'sub_avg']
+        col_labels = ['fighter_id', 'name', 'nickname', 'wins', 'losses', 'draws', 'height', 'weight', 'reach', 'stance', 'dob', 'sig_str_pm', 'str_acc', 'strikes_abs_pm', 'sig_str_def', 'td_avg', 'td_acc', 'td_def', 'sub_avg', 'url']
         df = pd.DataFrame(columns=col_labels)
 
         url = 'http://ufcstats.com/statistics/fighters'
@@ -94,6 +94,7 @@ class Scraper:
                 fighter_soup = self.get_soup(fighter_url)
                 row.append(fighter_id)
                 row = self.parse_fighter_details(fighter_soup)
+                row.append(fighter_url)
                 rows.append(row)
                 fighter_id += 1
 
@@ -228,8 +229,8 @@ if __name__ == '__main__':
     scraper = Scraper()
     # soup = scraper.get_soup('http://ufcstats.com/fighter-details/ce783bf73b5131f9')
     # data = scraper.parse_fighter_details(soup)
-    data = scraper.scrape_fight_details(lim=1)
+    data = scraper.scrape_rankings()
     scraper.close()
 
-    print(data.head())
+    print(data)
     # print(data.shape)
