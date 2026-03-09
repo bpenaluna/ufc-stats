@@ -1,2 +1,2 @@
-<img width="698" height="389" alt="overview-dashboard" src="https://github.com/user-attachments/assets/8ecb4984-01aa-4e9d-b582-d71cf8d96790" />
-<img width="698" height="391" alt="kd-dashboard" src="https://github.com/user-attachments/assets/3b80b1da-48c2-4530-9dc3-f2c786cd7842" />
+<img width="697" height="392" alt="overview-dashboard" src="https://github.com/user-attachments/assets/c8fb0bc7-b629-4401-b400-84f530189c4c" />
+<img width="696" height="392" alt="kd-dashboard" src="https://github.com/user-attachments/assets/3e323537-e0ac-485d-872c-f0fee11c82fd" />
