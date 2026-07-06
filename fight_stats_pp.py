@@ -7,6 +7,9 @@ from sqlalchemy import create_engine
 # Import data
 fight_stats = pd.read_csv(config.PATH + '/ufc-stats/data/scraped_data/fight_stats_raw.csv')
 
+# Drop the Unnamed: 0 column if it exists
+fight_stats = fight_stats.drop(columns=['Unnamed: 0'], errors='ignore')
+
 def get_perc(x: str) -> float:
     '''
     Args:
@@ -164,9 +167,11 @@ fill_na = {
 fight_stats = fight_stats.fillna(fill_na)
 
 fight_stats.to_csv(config.PATH + '/ufc-stats/data/clean_data/fight_stats_clean.csv')
+print("Clean CSV file saved")
 
 conn_str = f"mssql+pyodbc://{config.DB_SERVER}/{config.DB_NAME}?driver=ODBC+Driver+18+for+SQL+Server&trusted_connection=yes&TrustServerCertificate=yes"
 engine = create_engine(conn_str)
+print("Connection to database secured")
 
 fight_stats.to_sql('fight_stats', con=engine, if_exists='replace', index=False)
 print("Table (fight_stats) created successfully!")
